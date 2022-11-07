@@ -19,6 +19,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+          fetch-depth: 0
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
@@ -41,9 +43,30 @@ jobs:
         CI: true
     - name: deploy
       run: |
-        docker build -t hello .
-        docker run -d -p 5000:5000 hello
-        docker ps -a
+          cat > ~/.netrc <<EOF
+            machine api.heroku.com
+              login $HEROKU_EMAIL
+              password $HEROKU_API_KEY
+            machine git.heroku.com
+              login $HEROKU_EMAIL
+              password $HEROKU_API_KEY
+          EOF
+       env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}  
+     - name: Add Heroku remote
+       run:|
+          heroku git:remote --app $HEROKU_APP_NAME
+      env:
+         HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }} 
+       -name: Deploy to Heroku
+        run: |
+          git push heroku main
+          curl 'https://${{ secrets.HEROKU_APP_NAME }}.herokuapp.com/'
+       
+       
+       
+      
       
       
       
