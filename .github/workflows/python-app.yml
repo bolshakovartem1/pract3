@@ -59,8 +59,8 @@ jobs:
           heroku git:remote --app $HEROKU_APP_NAME
       env:
          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }} 
-    -name: Deploy to Heroku
-        run: |
+    - name: Deploy to Heroku
+         run:|
           git push heroku main
           curl 'https://${{ secrets.HEROKU_APP_NAME }}.herokuapp.com/'
        
